@@ -34,81 +34,84 @@ export default function SignUp() {
     if (error) {
       setError(error.message);
     } else if (data?.session) {
-      // Email confirmation is off, or already confirmed — go straight there.
       router.push(redirectTarget);
     } else {
-      // Email confirmation required — they'll land on redirectTarget after clicking the email link.
       setCheckEmail(true);
     }
   }
 
   if (checkEmail) {
     return (
-      <main style={{ maxWidth: 400, margin: '80px auto', padding: '0 20px' }}>
-        <h1>📬 Check your email</h1>
-        <p>
-          We sent a confirmation link to <strong>{email}</strong>. Click it to finish creating your
-          account — it&apos;ll take you right back to where you left off.
-        </p>
-      </main>
+      <div>
+        <header className="rc-header">
+          <a href="/" className="rc-brand">🎬 ReelContenders</a>
+        </header>
+        <div className="rc-sprockets" />
+        <main className="rc-page" style={{ maxWidth: 420 }}>
+          <h1 className="rc-title">Check Your Email</h1>
+          <p className="rc-subtitle">
+            We sent a confirmation link to <strong>{email}</strong>. Click it to finish creating
+            your account — it&apos;ll take you right back to where you left off.
+          </p>
+        </main>
+      </div>
     );
   }
 
   return (
-    <main style={{ maxWidth: 400, margin: '80px auto', padding: '0 20px' }}>
-      <h1>🎬 Create your ReelContenders account</h1>
-      <form onSubmit={handleSignUp} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <input
-          type="text"
-          placeholder="Display name"
-          value={displayName}
-          onChange={(e) => setDisplayName(e.target.value)}
-          required
-          style={inputStyle}
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          style={inputStyle}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          minLength={6}
-          style={inputStyle}
-        />
-        {error && <p style={{ color: '#c62828' }}>{error}</p>}
-        <button type="submit" disabled={loading} style={buttonStyle}>
-          {loading ? 'Creating account...' : 'Sign Up'}
-        </button>
-      </form>
-      <p style={{ marginTop: 16 }}>
-        Already have an account?{' '}
-        <a href={`/login?redirect=${encodeURIComponent(redirectTarget)}`}>Log in</a>
-      </p>
-    </main>
+    <div>
+      <header className="rc-header">
+        <a href="/" className="rc-brand">🎬 ReelContenders</a>
+      </header>
+      <div className="rc-sprockets" />
+
+      <main className="rc-page" style={{ maxWidth: 420 }}>
+        <h1 className="rc-title">Get Your Ticket</h1>
+        <p className="rc-subtitle">Create your ReelContenders account.</p>
+
+        <form onSubmit={handleSignUp} className="rc-form">
+          <label className="rc-label">
+            Display name
+            <input
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              required
+              className="rc-input"
+            />
+          </label>
+          <label className="rc-label">
+            Email
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="rc-input"
+            />
+          </label>
+          <label className="rc-label">
+            Password
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              className="rc-input"
+            />
+          </label>
+          {error && <p className="rc-error">{error}</p>}
+          <button type="submit" disabled={loading} className="rc-btn-primary">
+            {loading ? 'Creating account...' : 'Sign Up'}
+          </button>
+        </form>
+
+        <p style={{ marginTop: 20, color: 'var(--color-muted)' }}>
+          Already have an account?{' '}
+          <a href={`/login?redirect=${encodeURIComponent(redirectTarget)}`}>Log in</a>
+        </p>
+      </main>
+    </div>
   );
 }
-
-const inputStyle = {
-  padding: '10px 12px',
-  borderRadius: 6,
-  border: '1px solid #ccc',
-  fontSize: 16,
-};
-
-const buttonStyle = {
-  padding: '10px 12px',
-  borderRadius: 6,
-  border: 'none',
-  backgroundColor: '#1a1a1a',
-  color: 'white',
-  fontSize: 16,
-  cursor: 'pointer',
-};
