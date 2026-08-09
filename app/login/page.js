@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
 
 export default function Login() {
@@ -10,6 +10,8 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTarget = searchParams.get('redirect') || '/dashboard';
 
   async function handleLogin(e) {
     e.preventDefault();
@@ -23,7 +25,7 @@ export default function Login() {
     if (error) {
       setError(error.message);
     } else {
-      router.push('/dashboard');
+      router.push(redirectTarget);
     }
   }
 
@@ -53,7 +55,8 @@ export default function Login() {
         </button>
       </form>
       <p style={{ marginTop: 16 }}>
-        Don&apos;t have an account? <a href="/signup">Sign up</a>
+        Don&apos;t have an account?{' '}
+        <a href={`/signup?redirect=${encodeURIComponent(redirectTarget)}`}>Sign up</a>
       </p>
     </main>
   );
