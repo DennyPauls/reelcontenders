@@ -30,51 +30,48 @@ export default function Login() {
   }
 
   return (
-    <main style={{ maxWidth: 400, margin: '80px auto', padding: '0 20px' }}>
-      <h1>🎬 Log in to ReelContenders</h1>
-      <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          style={inputStyle}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          style={inputStyle}
-        />
-        {error && <p style={{ color: '#c62828' }}>{error}</p>}
-        <button type="submit" disabled={loading} style={buttonStyle}>
-          {loading ? 'Logging in...' : 'Log In'}
-        </button>
-      </form>
-      <p style={{ marginTop: 16 }}>
-        Don&apos;t have an account?{' '}
-        <a href={`/signup?redirect=${encodeURIComponent(redirectTarget)}`}>Sign up</a>
-      </p>
-    </main>
+    <div>
+      <header className="rc-header">
+        <a href="/" className="rc-brand">🎬 ReelContenders</a>
+      </header>
+      <div className="rc-sprockets" />
+
+      <main className="rc-page" style={{ maxWidth: 420 }}>
+        <h1 className="rc-title">Log In</h1>
+        <p className="rc-subtitle">Welcome back to the theater.</p>
+
+        <form onSubmit={handleLogin} className="rc-form">
+          <label className="rc-label">
+            Email
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="rc-input"
+            />
+          </label>
+          <label className="rc-label">
+            Password
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="rc-input"
+            />
+          </label>
+          {error && <p className="rc-error">{error}</p>}
+          <button type="submit" disabled={loading} className="rc-btn-primary">
+            {loading ? 'Logging in...' : 'Log In'}
+          </button>
+        </form>
+
+        <p style={{ marginTop: 20, color: 'var(--color-muted)' }}>
+          Don&apos;t have an account?{' '}
+          <a href={`/signup?redirect=${encodeURIComponent(redirectTarget)}`}>Sign up</a>
+        </p>
+      </main>
+    </div>
   );
 }
-
-const inputStyle = {
-  padding: '10px 12px',
-  borderRadius: 6,
-  border: '1px solid #ccc',
-  fontSize: 16,
-};
-
-const buttonStyle = {
-  padding: '10px 12px',
-  borderRadius: 6,
-  border: 'none',
-  backgroundColor: '#1a1a1a',
-  color: 'white',
-  fontSize: 16,
-  cursor: 'pointer',
-};
