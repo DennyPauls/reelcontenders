@@ -35,58 +35,38 @@ export default function Dashboard() {
     router.push('/login');
   }
 
-  if (loading) return <p style={{ margin: 40 }}>Loading...</p>;
+  if (loading) return <p style={{ margin: 40, color: 'var(--color-cream-text)' }}>Loading...</p>;
 
   return (
-    <main style={{ maxWidth: 600, margin: '60px auto', padding: '0 20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>🎬 ReelContenders</h1>
-        <button onClick={handleLogout} style={secondaryButtonStyle}>Log Out</button>
-      </div>
-      <p style={{ color: '#666' }}>Logged in as <strong>{user?.email}</strong></p>
+    <div>
+      <header className="rc-header">
+        <span className="rc-brand">🎬 ReelContenders</span>
+        <button onClick={handleLogout} className="rc-btn-secondary">Log Out</button>
+      </header>
+      <div className="rc-sprockets" />
 
-      <div style={{ margin: '24px 0' }}>
-        <a href="/leagues/create" style={buttonStyle}>+ Create a League</a>
-      </div>
+      <main className="rc-page">
+        <p className="rc-stat" style={{ marginBottom: 24 }}>Logged in as {user?.email}</p>
 
-      <h2 style={{ fontSize: 18 }}>Your Leagues</h2>
-      {leagues.length === 0 && (
-        <p style={{ color: '#999' }}>
-          You&apos;re not in any leagues yet. Create one above, or ask a friend for their invite link.
-        </p>
-      )}
-      <ul style={{ paddingLeft: 0, listStyle: 'none' }}>
+        <a href="/leagues/create" className="rc-btn-primary" style={{ marginBottom: 32, display: 'inline-block' }}>
+          + Create a League
+        </a>
+
+        <h2 className="rc-section-title">Your Leagues</h2>
+        {leagues.length === 0 && (
+          <p className="rc-subtitle">
+            You&apos;re not in any leagues yet. Create one above, or ask a friend for their invite link.
+          </p>
+        )}
         {leagues.map((league) => (
-          <li key={league.id} style={{ border: '1px solid #ddd', borderRadius: 8, padding: 16, marginBottom: 12 }}>
-            <a href={`/leagues/${league.id}`} style={{ fontWeight: 600, textDecoration: 'none', color: '#1a1a1a' }}>
-              {league.name}
-            </a>
-            <p style={{ margin: '4px 0 0', color: '#666', fontSize: 14 }}>
-              {league.content_rating_cap} and under · {league.status}
-            </p>
-          </li>
+          <a key={league.id} href={`/leagues/${league.id}`} style={{ textDecoration: 'none' }}>
+            <div className="rc-card">
+              <p className="rc-card-title">{league.name}</p>
+              <p className="rc-card-meta">{league.content_rating_cap} and under · {league.status}</p>
+            </div>
+          </a>
         ))}
-      </ul>
-    </main>
+      </main>
+    </div>
   );
 }
-
-const buttonStyle = {
-  display: 'inline-block',
-  padding: '10px 16px',
-  borderRadius: 6,
-  backgroundColor: '#1a1a1a',
-  color: 'white',
-  textDecoration: 'none',
-  fontSize: 16,
-};
-
-const secondaryButtonStyle = {
-  padding: '8px 14px',
-  borderRadius: 6,
-  border: 'none',
-  backgroundColor: '#1a1a1a',
-  color: 'white',
-  fontSize: 14,
-  cursor: 'pointer',
-};
