@@ -20,7 +20,7 @@ export default function LeaguePage() {
     async function load() {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData?.user) {
-        router.push('/login');
+        router.push(`/login?redirect=${encodeURIComponent(`/leagues/${id}`)}`);
         return;
       }
       setUser(userData.user);
