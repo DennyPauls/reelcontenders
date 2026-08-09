@@ -17,83 +17,63 @@ export default function Home() {
   }, []);
 
   return (
-    <main style={{ maxWidth: 600, margin: '60px auto', padding: '0 20px' }}>
-      <h1 style={{ marginBottom: 4 }}>🎬 ReelContenders</h1>
-      <p style={{ color: '#666', marginTop: 0 }}>
-        A fantasy league for movies that already exist.
-      </p>
+    <div>
+      <header className="rc-header">
+        <span className="rc-brand">🎬 ReelContenders</span>
+      </header>
+      <div className="rc-sprockets" />
 
-      <div style={{ display: 'flex', gap: 12, margin: '20px 0' }}>
-        <a href="/signup" style={buttonStyle}>Sign Up</a>
-        <a href="/login" style={secondaryButtonStyle}>Log In</a>
-      </div>
+      <main className="rc-page">
+        <h1 className="rc-title">Now Drafting</h1>
+        <p className="rc-subtitle">A fantasy league for movies that already exist.</p>
 
-      <hr style={{ margin: '32px 0', border: 'none', borderTop: '1px solid #eee' }} />
-
-      <p style={{ color: '#999', fontSize: 14 }}>System check — confirming everything is wired up correctly.</p>
-
-      {loading && <p>Checking connections...</p>}
-
-      {status && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 16 }}>
-          <StatusCard
-            title="Database (Supabase)"
-            connected={status.supabase.connected}
-            message={status.supabase.message}
-          />
-          <StatusCard
-            title="Movie Data (TMDB)"
-            connected={status.tmdb.connected}
-            message={status.tmdb.message}
-          />
-
-          {status.tmdb.sampleMovie && (
-            <div style={{ border: '1px solid #ddd', borderRadius: 8, padding: 16 }}>
-              <p style={{ margin: 0, fontWeight: 600 }}>Sample movie pulled live from TMDB:</p>
-              <p style={{ margin: '8px 0 0' }}>
-                {status.tmdb.sampleMovie.title} ({status.tmdb.sampleMovie.releaseDate}) — rating{' '}
-                {status.tmdb.sampleMovie.rating}/10
-              </p>
-            </div>
-          )}
+        <div style={{ display: 'flex', gap: 12, margin: '20px 0 8px' }}>
+          <a href="/signup" className="rc-btn-primary">Sign Up</a>
+          <a href="/login" className="rc-btn-secondary">Log In</a>
         </div>
-      )}
-    </main>
+
+        <h2 className="rc-section-title">System Check</h2>
+
+        {loading && <p className="rc-stat">Checking connections...</p>}
+
+        {status && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <StatusCard
+              title="Database (Supabase)"
+              connected={status.supabase.connected}
+              message={status.supabase.message}
+            />
+            <StatusCard
+              title="Movie Data (TMDB)"
+              connected={status.tmdb.connected}
+              message={status.tmdb.message}
+            />
+            {status.tmdb.sampleMovie && (
+              <div className="rc-card">
+                <p className="rc-card-title">Sample pull from TMDB</p>
+                <p className="rc-card-meta">
+                  {status.tmdb.sampleMovie.title} ({status.tmdb.sampleMovie.releaseDate}) — rating{' '}
+                  {status.tmdb.sampleMovie.rating}/10
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </main>
+    </div>
   );
 }
 
 function StatusCard({ title, connected, message }) {
   return (
     <div
-      style={{
-        border: `1px solid ${connected ? '#2e7d32' : '#c62828'}`,
-        backgroundColor: connected ? '#edf7ed' : '#fdecea',
-        borderRadius: 8,
-        padding: 16,
-      }}
+      className="rc-card"
+      style={{ borderLeftColor: connected ? '#3f6b3a' : '#7a1f2b' }}
     >
-      <p style={{ margin: 0, fontWeight: 600 }}>
+      <p className="rc-card-title">
         {connected ? '✅' : '❌'} {title}
       </p>
-      <p style={{ margin: '4px 0 0', color: '#333' }}>{message}</p>
+      <p className="rc-card-meta">{message}</p>
     </div>
   );
 }
-
-const buttonStyle = {
-  padding: '10px 20px',
-  borderRadius: 6,
-  backgroundColor: '#1a1a1a',
-  color: 'white',
-  textDecoration: 'none',
-  fontSize: 16,
-};
-
-const secondaryButtonStyle = {
-  padding: '10px 20px',
-  borderRadius: 6,
-  border: '1px solid #1a1a1a',
-  color: '#1a1a1a',
-  textDecoration: 'none',
-  fontSize: 16,
-};
