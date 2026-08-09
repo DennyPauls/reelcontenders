@@ -63,92 +63,75 @@ export default function CreateLeague() {
   }
 
   return (
-    <main style={{ maxWidth: 480, margin: '60px auto', padding: '0 20px' }}>
-      <h1>🎬 Create a League</h1>
-      <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <label style={labelStyle}>
-          League name
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            placeholder="e.g. The Paulsen Family League"
-            style={inputStyle}
-          />
-        </label>
+    <div>
+      <header className="rc-header">
+        <a href="/" className="rc-brand">🎬 ReelContenders</a>
+      </header>
+      <div className="rc-sprockets" />
 
-        <label style={labelStyle}>
-          Content rating cap
-          <select
-            value={contentRatingCap}
-            onChange={(e) => setContentRatingCap(e.target.value)}
-            style={inputStyle}
-          >
-            <option value="G">G and under</option>
-            <option value="PG">PG and under</option>
-            <option value="PG-13">PG-13 and under</option>
-            <option value="R">R and under</option>
-            <option value="unrated">No restriction</option>
-          </select>
-        </label>
+      <main className="rc-page" style={{ maxWidth: 480 }}>
+        <h1 className="rc-title">Start a League</h1>
+        <p className="rc-subtitle">Set the rules for your table.</p>
 
-        <label style={labelStyle}>
-          Picks per player
-          <input
-            type="number"
-            min={3}
-            max={12}
-            value={picksPerPlayer}
-            onChange={(e) => setPicksPerPlayer(Number(e.target.value))}
-            style={inputStyle}
-          />
-        </label>
+        <form onSubmit={handleCreate} className="rc-form">
+          <label className="rc-label">
+            League name
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              placeholder="e.g. The Paulsen Family League"
+              className="rc-input"
+            />
+          </label>
 
-        <label style={labelStyle}>
-          Season length (weeks)
-          <input
-            type="number"
-            min={4}
-            max={20}
-            value={seasonWeeks}
-            onChange={(e) => setSeasonWeeks(Number(e.target.value))}
-            style={inputStyle}
-          />
-        </label>
+          <label className="rc-label">
+            Content rating cap
+            <select
+              value={contentRatingCap}
+              onChange={(e) => setContentRatingCap(e.target.value)}
+              className="rc-input"
+            >
+              <option value="G">G and under</option>
+              <option value="PG">PG and under</option>
+              <option value="PG-13">PG-13 and under</option>
+              <option value="R">R and under</option>
+              <option value="unrated">No restriction</option>
+            </select>
+          </label>
 
-        {error && <p style={{ color: '#c62828' }}>{error}</p>}
+          <label className="rc-label">
+            Picks per player
+            <input
+              type="number"
+              min={3}
+              max={12}
+              value={picksPerPlayer}
+              onChange={(e) => setPicksPerPlayer(Number(e.target.value))}
+              className="rc-input"
+            />
+          </label>
 
-        <button type="submit" disabled={loading} style={buttonStyle}>
-          {loading ? 'Creating...' : 'Create League'}
-        </button>
-      </form>
-    </main>
+          <label className="rc-label">
+            Season length (weeks)
+            <input
+              type="number"
+              min={4}
+              max={20}
+              value={seasonWeeks}
+              onChange={(e) => setSeasonWeeks(Number(e.target.value))}
+              className="rc-input"
+            />
+          </label>
+
+          {error && <p className="rc-error">{error}</p>}
+
+          <button type="submit" disabled={loading} className="rc-btn-primary">
+            {loading ? 'Creating...' : 'Create League'}
+          </button>
+        </form>
+      </main>
+    </div>
   );
 }
-
-const labelStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 6,
-  fontWeight: 600,
-  fontSize: 14,
-};
-
-const inputStyle = {
-  padding: '10px 12px',
-  borderRadius: 6,
-  border: '1px solid #ccc',
-  fontSize: 16,
-  fontWeight: 400,
-};
-
-const buttonStyle = {
-  padding: '10px 12px',
-  borderRadius: 6,
-  border: 'none',
-  backgroundColor: '#1a1a1a',
-  color: 'white',
-  fontSize: 16,
-  cursor: 'pointer',
-};
