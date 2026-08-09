@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
 
 export default function SignUp() {
@@ -10,18 +10,22 @@ export default function SignUp() {
   const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [checkEmail, setCheckEmail] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTarget = searchParams.get('redirect') || '/dashboard';
 
   async function handleSignUp(e) {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: { display_name: displayName },
+        emailRedirectTo: `${window.location.origin}${redirectTarget}`,
       },
     });
 
@@ -29,9 +33,25 @@ export default function SignUp() {
 
     if (error) {
       setError(error.message);
+    } else if (data?.session) {
+      // Email confirmation is off, or already confirmed — go straight there.
+      router.push(redirectTarget);
     } else {
-      router.push('/dashboard');
+      // Email confirmation required — they'll land on redirectTarget after clicking the email link.
+      setCheckEmail(true);
     }
+  }
+
+  if (checkEmail) {
+    return (
+      <main style={{ maxWidth: 400, margin: '80px auto', padding: '0 20px' }}>
+        <h1>📬 Check your email</h1>
+        <p>
+          We sent a confirmation link to <strong>{email}</strong>. Click it to finish creating your
+          account — it&apos;ll take you right back to where you left off.
+        </p>
+      </main>
+    );
   }
 
   return (
@@ -69,7 +89,8 @@ export default function SignUp() {
         </button>
       </form>
       <p style={{ marginTop: 16 }}>
-        Already have an account? <a href="/login">Log in</a>
+        Already have an account?{' '}
+        <a href={`/login?redirect=${encodeURIComponent(redirectTarget)}`}>Log in</a>
       </p>
     </main>
   );
