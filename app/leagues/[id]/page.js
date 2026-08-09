@@ -79,8 +79,6 @@ export default function LeaguePage() {
   if (loading) return <p style={{ margin: 40, color: 'var(--color-cream-text)' }}>Loading...</p>;
   if (error && !league) return <p style={{ margin: 40, color: '#e3897d' }}>{error}</p>;
 
-  const isCreator = league.created_by === user?.id;
-
   return (
     <div>
       <header className="rc-header">
@@ -105,15 +103,21 @@ export default function LeaguePage() {
         )}
 
         {isMember && (
-          <div className="rc-card">
-            <p className="rc-card-title">Invite Friends</p>
-            <p className="rc-card-meta" style={{ marginBottom: 12 }}>
-              Share this page&apos;s link — anyone who opens it can join.
-            </p>
-            <button onClick={copyInviteLink} className="rc-btn-secondary" style={{ borderColor: 'var(--color-marquee-red)', color: 'var(--color-marquee-red)' }}>
-              {copied ? 'Copied!' : 'Copy Invite Link'}
-            </button>
-          </div>
+          <>
+            <div className="rc-card">
+              <p className="rc-card-title">Invite Friends</p>
+              <p className="rc-card-meta" style={{ marginBottom: 12 }}>
+                Share this page&apos;s link — anyone who opens it can join.
+              </p>
+              <button onClick={copyInviteLink} className="rc-btn-secondary" style={{ borderColor: 'var(--color-marquee-red)', color: 'var(--color-marquee-red)' }}>
+                {copied ? 'Copied!' : 'Copy Invite Link'}
+              </button>
+            </div>
+
+            <a href={`/leagues/${id}/draft`} className="rc-btn-primary" style={{ display: 'inline-block', marginTop: 8 }}>
+              {league.status === 'setup' ? 'Go to Waiting Room' : league.status === 'drafting' ? 'Enter Draft Room' : 'View Draft Results'}
+            </a>
+          </>
         )}
 
         <h2 className="rc-section-title">Members ({members.length})</h2>
@@ -125,12 +129,6 @@ export default function LeaguePage() {
             </li>
           ))}
         </ul>
-
-        {isCreator && (
-          <p className="rc-subtitle" style={{ marginTop: 24 }}>
-            Draft setup comes next — once enough friends have joined, you&apos;ll be able to start the draft here.
-          </p>
-        )}
       </main>
     </div>
   );
