@@ -76,75 +76,62 @@ export default function LeaguePage() {
     setTimeout(() => setCopied(false), 2000);
   }
 
-  if (loading) return <p style={{ margin: 40 }}>Loading...</p>;
-  if (error && !league) return <p style={{ margin: 40, color: '#c62828' }}>{error}</p>;
+  if (loading) return <p style={{ margin: 40, color: 'var(--color-cream-text)' }}>Loading...</p>;
+  if (error && !league) return <p style={{ margin: 40, color: '#e3897d' }}>{error}</p>;
 
   const isCreator = league.created_by === user?.id;
 
   return (
-    <main style={{ maxWidth: 600, margin: '60px auto', padding: '0 20px' }}>
-      <h1 style={{ marginBottom: 4 }}>🎬 {league.name}</h1>
-      <p style={{ color: '#666', marginTop: 0 }}>
-        {league.content_rating_cap} and under · {league.picks_per_player} picks per player ·{' '}
-        {league.season_weeks}-week season
-      </p>
+    <div>
+      <header className="rc-header">
+        <a href="/" className="rc-brand">🎬 ReelContenders</a>
+      </header>
+      <div className="rc-sprockets" />
 
-      {!isMember && (
-        <div style={{ margin: '20px 0' }}>
-          <button onClick={handleJoin} disabled={joining} style={buttonStyle}>
-            {joining ? 'Joining...' : 'Join this League'}
-          </button>
-          {error && <p style={{ color: '#c62828' }}>{error}</p>}
-        </div>
-      )}
-
-      {isMember && (
-        <div style={{ margin: '20px 0', padding: 16, border: '1px solid #ddd', borderRadius: 8 }}>
-          <p style={{ margin: 0, fontWeight: 600 }}>Invite friends</p>
-          <p style={{ margin: '4px 0 12px', color: '#666', fontSize: 14 }}>
-            Share this page&apos;s link — anyone who opens it can join.
-          </p>
-          <button onClick={copyInviteLink} style={secondaryButtonStyle}>
-            {copied ? 'Copied!' : 'Copy Invite Link'}
-          </button>
-        </div>
-      )}
-
-      <h2 style={{ fontSize: 18, marginTop: 32 }}>Members ({members.length})</h2>
-      <ul style={{ paddingLeft: 20 }}>
-        {members.map((m) => (
-          <li key={m.user_id}>
-            {m.users?.display_name || m.users?.email}
-            {league.created_by === m.user_id && ' (commissioner)'}
-          </li>
-        ))}
-      </ul>
-
-      {isCreator && (
-        <p style={{ color: '#999', fontSize: 14, marginTop: 24 }}>
-          Draft setup comes next — once enough friends have joined, you&apos;ll be able to start the draft here.
+      <main className="rc-page">
+        <h1 className="rc-title">{league.name}</h1>
+        <p className="rc-stat" style={{ marginBottom: 24 }}>
+          {league.content_rating_cap} and under · {league.picks_per_player} picks per player ·{' '}
+          {league.season_weeks}-week season
         </p>
-      )}
-    </main>
+
+        {!isMember && (
+          <div style={{ margin: '20px 0' }}>
+            <button onClick={handleJoin} disabled={joining} className="rc-btn-primary">
+              {joining ? 'Joining...' : 'Join this League'}
+            </button>
+            {error && <p className="rc-error">{error}</p>}
+          </div>
+        )}
+
+        {isMember && (
+          <div className="rc-card">
+            <p className="rc-card-title">Invite Friends</p>
+            <p className="rc-card-meta" style={{ marginBottom: 12 }}>
+              Share this page&apos;s link — anyone who opens it can join.
+            </p>
+            <button onClick={copyInviteLink} className="rc-btn-secondary" style={{ borderColor: 'var(--color-marquee-red)', color: 'var(--color-marquee-red)' }}>
+              {copied ? 'Copied!' : 'Copy Invite Link'}
+            </button>
+          </div>
+        )}
+
+        <h2 className="rc-section-title">Members ({members.length})</h2>
+        <ul className="rc-list">
+          {members.map((m) => (
+            <li key={m.user_id}>
+              {m.users?.display_name || m.users?.email}
+              {league.created_by === m.user_id && <span className="rc-stat"> — commissioner</span>}
+            </li>
+          ))}
+        </ul>
+
+        {isCreator && (
+          <p className="rc-subtitle" style={{ marginTop: 24 }}>
+            Draft setup comes next — once enough friends have joined, you&apos;ll be able to start the draft here.
+          </p>
+        )}
+      </main>
+    </div>
   );
 }
-
-const buttonStyle = {
-  padding: '10px 16px',
-  borderRadius: 6,
-  border: 'none',
-  backgroundColor: '#1a1a1a',
-  color: 'white',
-  fontSize: 16,
-  cursor: 'pointer',
-};
-
-const secondaryButtonStyle = {
-  padding: '8px 14px',
-  borderRadius: 6,
-  border: '1px solid #1a1a1a',
-  backgroundColor: 'white',
-  color: '#1a1a1a',
-  fontSize: 14,
-  cursor: 'pointer',
-};
