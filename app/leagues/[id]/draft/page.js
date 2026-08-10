@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '../../../../lib/supabaseClient';
+import Header from '../../../components/Header';
 
 export default function DraftRoom() {
   const { id } = useParams();
@@ -10,7 +11,7 @@ export default function DraftRoom() {
 
   const [user, setUser] = useState(null);
   const [league, setLeague] = useState(null);
-  const [members, setMembers] = useState([]); // ordered by join time = draft order
+  const [members, setMembers] = useState([]);
   const [picks, setPicks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -62,7 +63,6 @@ export default function DraftRoom() {
     loadAll();
   }, [loadAll]);
 
-  // --- Search TMDB as the user types ---
   useEffect(() => {
     if (query.trim().length < 2) {
       setResults([]);
@@ -154,10 +154,9 @@ export default function DraftRoom() {
   const totalNeeded = members.length * league.picks_per_player;
   const draftedTmdbIds = new Set(picks.map((p) => p.tmdb_id));
 
-  // --- Snake draft turn calculation ---
   const n = members.length;
   const totalPicksMade = picks.length;
-  const round = Math.floor(totalPicksMade / n); // 0-indexed
+  const round = Math.floor(totalPicksMade / n);
   const posInRound = totalPicksMade % n;
   const orderIndex = round % 2 === 0 ? posInRound : n - 1 - posInRound;
   const currentTurnMember = members[orderIndex];
@@ -166,10 +165,7 @@ export default function DraftRoom() {
 
   return (
     <div>
-      <header className="rc-header">
-        <a href="/" className="rc-brand">🎬 ReelContenders</a>
-      </header>
-      <div className="rc-sprockets" />
+      <Header />
 
       <main className="rc-page">
         <h1 className="rc-title">{league.name} — Draft</h1>
