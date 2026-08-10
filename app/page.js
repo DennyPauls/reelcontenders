@@ -1,79 +1,79 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Header from './components/Header';
+import { supabase } from '../lib/supabaseClient';
 
 export default function Home() {
-  const [status, setStatus] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch('/api/test-connection')
-      .then((res) => res.json())
-      .then((data) => {
-        setStatus(data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    supabase.auth.getUser().then(({ data }) => setUser(data?.user || null));
   }, []);
 
   return (
     <div>
-      <header className="rc-header">
-        <span className="rc-brand">🎬 ReelContenders</span>
-      </header>
-      <div className="rc-sprockets" />
+      <Header />
 
       <main className="rc-page">
         <h1 className="rc-title">Now Drafting</h1>
-        <p className="rc-subtitle">A fantasy league for movies that already exist.</p>
+        <p className="rc-subtitle" style={{ fontSize: 18 }}>
+          A fantasy league for movies that already exist. Draft the classics and favorites you love,
+          face off head-to-head with friends and family, and settle once and for all whose taste in
+          movies actually holds up.
+        </p>
 
-        <div style={{ display: 'flex', gap: 12, margin: '20px 0 8px' }}>
-          <a href="/signup" className="rc-btn-primary">Sign Up</a>
-          <a href="/login" className="rc-btn-secondary">Log In</a>
+        <div style={{ display: 'flex', gap: 12, margin: '20px 0 40px' }}>
+          {user ? (
+            <a href="/dashboard" className="rc-btn-primary">Go to Dashboard</a>
+          ) : (
+            <>
+              <a href="/signup" className="rc-btn-primary">Get Your Ticket</a>
+              <a href="/login" className="rc-btn-secondary">Log In</a>
+            </>
+          )}
         </div>
 
-        <h2 className="rc-section-title">System Check</h2>
-
-        {loading && <p className="rc-stat">Checking connections...</p>}
-
-        {status && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <StatusCard
-              title="Database (Supabase)"
-              connected={status.supabase.connected}
-              message={status.supabase.message}
-            />
-            <StatusCard
-              title="Movie Data (TMDB)"
-              connected={status.tmdb.connected}
-              message={status.tmdb.message}
-            />
-            {status.tmdb.sampleMovie && (
-              <div className="rc-card">
-                <p className="rc-card-title">Sample pull from TMDB</p>
-                <p className="rc-card-meta">
-                  {status.tmdb.sampleMovie.title} ({status.tmdb.sampleMovie.releaseDate}) — rating{' '}
-                  {status.tmdb.sampleMovie.rating}/10
-                </p>
-              </div>
-            )}
+        <h2 className="rc-section-title">How It Works</h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
+          <div className="rc-card">
+            <p className="rc-card-title">🎬 Draft your roster</p>
+            <p className="rc-card-meta">
+              Pick movies you love — any movie already released, from 1970s classics to last year&apos;s
+              favorites. Once a movie&apos;s drafted, no one else in your league can take it.
+            </p>
           </div>
-        )}
-      </main>
-    </div>
-  );
-}
+          <div className="rc-card">
+            <p className="rc-card-title">⚔️ Face off each week</p>
+            <p className="rc-card-meta">
+              Every week you play one movie from your roster against an opponent&apos;s pick.
+              Scores stay hidden until both sides are revealed together.
+            </p>
+          </div>
+          <div className="rc-card">
+            <p className="rc-card-title">🏆 Scored on real data</p>
+            <p className="rc-card-meta">
+              Box office performance and TMDB&apos;s community score are combined with your own
+              league&apos;s ratings — the people who actually watched decide as much as the numbers do.
+            </p>
+          </div>
+          <div className="rc-card">
+            <p className="rc-card-title">🍿 Win bragging rights</p>
+            <p className="rc-card-meta">
+              Best record after a full season wins the league. A separate &quot;Most Underrated
+              Pick&quot; award goes to whoever&apos;s movie over-performed its reputation the most.
+            </p>
+          </div>
+        </div>
 
-function StatusCard({ title, connected, message }) {
-  return (
-    <div
-      className="rc-card"
-      style={{ borderLeftColor: connected ? '#3f6b3a' : '#7a1f2b' }}
-    >
-      <p className="rc-card-title">
-        {connected ? '✅' : '❌'} {title}
-      </p>
-      <p className="rc-card-meta">{message}</p>
+        <h2 className="rc-section-title">The Rules, Briefly</h2>
+        <ul className="rc-list">
+          <li>12-week seasons, with matchups scheduled round-robin style</li>
+          <li>8 movie picks per player, drafted snake-style before the season starts</li>
+          <li>Each league sets its own content rating cap — family-friendly or anything goes</li>
+          <li>Rosters lock after the draft — no trades once picks are made</li>
+        </ul>
+      </main>
     </div>
   );
 }
