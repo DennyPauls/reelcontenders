@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../../lib/supabaseClient';
+import Header from '../../components/Header';
 
 export default function CreateLeague() {
   const [name, setName] = useState('');
@@ -64,10 +65,7 @@ export default function CreateLeague() {
 
   return (
     <div>
-      <header className="rc-header">
-        <a href="/" className="rc-brand">🎬 ReelContenders</a>
-      </header>
-      <div className="rc-sprockets" />
+      <Header />
 
       <main className="rc-page" style={{ maxWidth: 480 }}>
         <h1 className="rc-title">Start a League</h1>
