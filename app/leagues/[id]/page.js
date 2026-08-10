@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '../../../lib/supabaseClient';
+import Header from '../../components/Header';
 
 export default function LeaguePage() {
   const { id } = useParams();
@@ -81,10 +82,7 @@ export default function LeaguePage() {
 
   return (
     <div>
-      <header className="rc-header">
-        <a href="/" className="rc-brand">🎬 ReelContenders</a>
-      </header>
-      <div className="rc-sprockets" />
+      <Header />
 
       <main className="rc-page">
         <h1 className="rc-title">{league.name}</h1>
