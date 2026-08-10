@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
+import Header from '../components/Header';
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -30,24 +31,13 @@ export default function Dashboard() {
     load();
   }, [router]);
 
-  async function handleLogout() {
-    await supabase.auth.signOut();
-    router.push('/login');
-  }
-
   if (loading) return <p style={{ margin: 40, color: 'var(--color-cream-text)' }}>Loading...</p>;
 
   return (
     <div>
-      <header className="rc-header">
-        <span className="rc-brand">🎬 ReelContenders</span>
-        <button onClick={handleLogout} className="rc-btn-secondary">Log Out</button>
-      </header>
-      <div className="rc-sprockets" />
+      <Header />
 
       <main className="rc-page">
-        <p className="rc-stat" style={{ marginBottom: 24 }}>Logged in as {user?.email}</p>
-
         <a href="/leagues/create" className="rc-btn-primary" style={{ marginBottom: 32, display: 'inline-block' }}>
           + Create a League
         </a>
