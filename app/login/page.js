@@ -3,6 +3,7 @@
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
+import Header from '../components/Header';
 
 export default function Login() {
   return (
@@ -39,10 +40,7 @@ function LoginForm() {
 
   return (
     <div>
-      <header className="rc-header">
-        <a href="/" className="rc-brand">🎬 ReelContenders</a>
-      </header>
-      <div className="rc-sprockets" />
+      <Header />
 
       <main className="rc-page" style={{ maxWidth: 420 }}>
         <h1 className="rc-title">Log In</h1>
