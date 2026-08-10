@@ -80,6 +80,15 @@ export default function LeaguePage() {
   if (loading) return <p style={{ margin: 40, color: 'var(--color-cream-text)' }}>Loading...</p>;
   if (error && !league) return <p style={{ margin: 40, color: '#e3897d' }}>{error}</p>;
 
+  const draftLinkLabel =
+    league.status === 'setup'
+      ? 'Go to Waiting Room'
+      : league.status === 'drafting'
+      ? 'Enter Draft Room'
+      : 'View Draft Results';
+
+  const draftLinkHref = league.status === 'active' ? `/leagues/${id}/season` : `/leagues/${id}/draft`;
+
   return (
     <div>
       <Header />
@@ -112,8 +121,8 @@ export default function LeaguePage() {
               </button>
             </div>
 
-            <a href={`/leagues/${id}/draft`} className="rc-btn-primary" style={{ display: 'inline-block', marginTop: 8 }}>
-              {league.status === 'setup' ? 'Go to Waiting Room' : league.status === 'drafting' ? 'Enter Draft Room' : 'View Draft Results'}
+            <a href={draftLinkHref} className="rc-btn-primary" style={{ display: 'inline-block', marginTop: 8 }}>
+              {league.status === 'active' ? 'Enter Season' : draftLinkLabel}
             </a>
           </>
         )}
