@@ -353,15 +353,48 @@ export default function SeasonPage() {
         )}
 
         <h2 className="rc-section-title">Past Weeks</h2>
-        {matchups
-          .filter((m) => m.status === 'revealed' && !m.is_bye)
-          .map((mu) => (
-            <p key={mu.id} className="rc-stat" style={{ marginBottom: 6 }}>
-              Wk {mu.round_number}: {nameFor(mu.player_a_id)} ({movieTitles[mu.player_a_tmdb_id]}) vs{' '}
-              {nameFor(mu.player_b_id)} ({movieTitles[mu.player_b_tmdb_id]}) —{' '}
-              {mu.winner_id ? `${nameFor(mu.winner_id)} won` : 'Tie'}
-            </p>
-          ))}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 24 }}>
+          {matchups
+            .filter((m) => m.status === 'revealed' && !m.is_bye)
+            .map((mu) => (
+              <div
+                key={mu.id}
+                style={{
+                  background: 'var(--color-paper)',
+                  borderLeft: '3px solid var(--color-marquee-red)',
+                  borderRadius: 3,
+                  padding: '10px 14px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: 12,
+                }}
+              >
+                <div style={{ fontSize: 12, color: '#5a5347' }}>
+                  <span style={{ color: 'var(--color-marquee-red)', fontWeight: 600 }}>
+                    Wk {mu.round_number}
+                  </span>
+                  {'  '}
+                  {nameFor(mu.player_a_id)} ({movieTitles[mu.player_a_tmdb_id]}) vs{' '}
+                  {nameFor(mu.player_b_id)} ({movieTitles[mu.player_b_tmdb_id]})
+                </div>
+                <div
+                  style={{
+                    background: 'var(--color-marquee-red)',
+                    color: 'var(--color-paper)',
+                    fontSize: 10,
+                    fontWeight: 600,
+                    padding: '4px 10px',
+                    borderRadius: 20,
+                    whiteSpace: 'nowrap',
+                    letterSpacing: '0.03em',
+                  }}
+                >
+                  {mu.winner_id ? `★ ${nameFor(mu.winner_id).toUpperCase()}` : 'TIE'}
+                </div>
+              </div>
+            ))}
+        </div>
       </main>
     </div>
   );
