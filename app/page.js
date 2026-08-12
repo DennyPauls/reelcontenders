@@ -15,25 +15,47 @@ export default function Home() {
     <div>
       <Header />
 
-      <main className="rc-page">
-        <h1 className="rc-title">Now Drafting</h1>
-        <p className="rc-subtitle" style={{ fontSize: 18 }}>
-          A fantasy league for movies that already exist. Draft the classics and favorites you love,
-          face off head-to-head with friends and family, and settle once and for all whose taste in
-          movies actually holds up.
-        </p>
+      {/* HERO — projector photo background */}
+      <div
+        style={{
+          position: 'relative',
+          backgroundImage: "url('/images/projector-hero.png')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          padding: '60px 20px',
+          marginBottom: '8px',
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background:
+              'linear-gradient(90deg, rgba(26,13,15,0.92) 0%, rgba(26,13,15,0.55) 55%, rgba(26,13,15,0.2) 100%)',
+          }}
+        />
+        <div style={{ position: 'relative', maxWidth: 640, margin: '0 auto' }}>
+          <h1 className="rc-title">Now Drafting</h1>
+          <p className="rc-subtitle" style={{ fontSize: 18 }}>
+            A fantasy league for movies that already exist. Draft the classics and favorites you love,
+            face off head-to-head with friends and family, and settle once and for all whose taste in
+            movies actually holds up.
+          </p>
 
-        <div style={{ display: 'flex', gap: 12, margin: '20px 0 40px' }}>
-          {user ? (
-            <a href="/dashboard" className="rc-btn-primary">Go to Dashboard</a>
-          ) : (
-            <>
-              <a href="/signup" className="rc-btn-primary">Get Your Ticket</a>
-              <a href="/login" className="rc-btn-secondary">Log In</a>
-            </>
-          )}
+          <div style={{ display: 'flex', gap: 12, margin: '20px 0 0' }}>
+            {user ? (
+              <a href="/dashboard" className="rc-btn-primary">Go to Dashboard</a>
+            ) : (
+              <>
+                <a href="/signup" className="rc-btn-primary">Get Your Ticket</a>
+                <a href="/login" className="rc-btn-secondary">Log In</a>
+              </>
+            )}
+          </div>
         </div>
+      </div>
 
+      <main className="rc-page">
         <h2 className="rc-section-title">How It Works</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
           <div className="rc-card">
