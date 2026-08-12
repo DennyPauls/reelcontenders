@@ -1,17 +1,17 @@
 /* ============================================================
    ReelContenders Design System
-   Vintage movie theater / ticket-stub aesthetic.
+   Premium cinema — burgundy/cream palette
    ============================================================ */
 
 :root {
-  --color-marquee-red: #7a1f2b;
-  --color-ink: #1c1a17;
-  --color-paper: #f2e9d8;
-  --color-paper-dim: #e4d7be;
-  --color-gold: #c9a227;
-  --color-gold-bright: #e0bb3d;
-  --color-cream-text: #f5f1e8;
-  --color-muted: #9a9182;
+  --color-marquee-red: #4a1f28;
+  --color-ink: #1a0d0f;
+  --color-paper: #e8dcc9;
+  --color-paper-dim: #d8bfb8;
+  --color-gold: #d99a6c;
+  --color-gold-bright: #e8dcc9;
+  --color-cream-text: #f3ead9;
+  --color-muted: #a68b7f;
 
   --font-display: var(--font-display-family), 'Arial Narrow', sans-serif;
   --font-body: var(--font-body-family), Georgia, serif;
@@ -231,3 +231,4 @@ a {
   padding: 8px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
+
