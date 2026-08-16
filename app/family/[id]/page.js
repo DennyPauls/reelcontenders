@@ -305,6 +305,15 @@ export default function FamilySessionPage() {
               </div>
             </>
           )}
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 32 }}>
+            <button onClick={() => router.push('/family/create')} className="rc-btn-primary">
+              Play Family Feature Again
+            </button>
+            <button onClick={() => router.push('/dashboard')} className="rc-btn-secondary">
+              Back to Dashboard
+            </button>
+          </div>
         </main>
       </div>
     );
