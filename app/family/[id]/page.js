@@ -27,12 +27,12 @@ function RatedProgress({ ratedCount, totalPicks, style }) {
 
 const CONFETTI_COLORS = ['var(--color-gold)', 'var(--color-cream-text)', '#b8860b', 'var(--color-paper)'];
 
-function generateConfetti(count = 24) {
+function generateConfetti(count = 48) {
   return Array.from({ length: count }, (_, i) => ({
     id: i,
     left: Math.random() * 100,
     delay: Math.random() * 0.4,
-    duration: 1.8 + Math.random() * 0.8,
+    duration: 3.6 + Math.random() * 0.8,
     size: 6 + Math.random() * 6,
     color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
     rounded: i % 3 === 0,
