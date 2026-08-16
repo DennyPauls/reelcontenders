@@ -88,7 +88,7 @@ function ModeLabel({ icon, children }) {
         letterSpacing: '0.5px',
         textTransform: 'uppercase',
         color: 'var(--color-gold-bright)',
-        margin: '0 0 12px',
+        margin: '0 0 16px',
       }}
     >
       {icon} {children}
@@ -148,11 +148,13 @@ export default function Home() {
       </div>
 
       <main className="rc-page rc-home-page">
-        <h2 className="rc-section-title">How It Works</h2>
-        <div className="rc-two-col" style={{ marginBottom: 32 }}>
+        <h2 className="rc-section-title" style={{ fontSize: 34, textAlign: 'center', marginBottom: 28 }}>
+          How It Works
+        </h2>
+        <div className="rc-two-col" style={{ marginBottom: 40 }}>
           <div>
             <ModeLabel icon="🏆">The League</ModeLabel>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div className="rc-card">
                 <p className="rc-card-title"><IconDraft />Draft your roster</p>
                 <p className="rc-card-meta">
@@ -186,7 +188,7 @@ export default function Home() {
 
           <div>
             <ModeLabel icon="🍿">Family Feature</ModeLabel>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div className="rc-card">
                 <p className="rc-card-title"><IconFamily />Add your family</p>
                 <p className="rc-card-meta">
@@ -218,7 +220,9 @@ export default function Home() {
           </div>
         </div>
 
-        <h2 className="rc-section-title">The Rules, Briefly</h2>
+        <h2 className="rc-section-title" style={{ fontSize: 34, textAlign: 'center', marginBottom: 28 }}>
+          The Rules, Briefly
+        </h2>
         <div className="rc-two-col">
           <div>
             <ModeLabel icon="🏆">The League</ModeLabel>
