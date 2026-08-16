@@ -37,6 +37,85 @@ function generateRoundRobin(n) {
   return schedule;
 }
 
+function StreamingLine({ providers }) {
+  const summary = summarizeProviders(providers);
+  const style = { fontSize: 13, fontFamily: 'var(--font-mono)', color: 'var(--color-marquee-red)', margin: '2px 0 0' };
+
+  if (summary) {
+    return <p style={style}>{summary.text}</p>;
+  }
+
+  // JustWatch's public data has real coverage gaps (a legitimately owned
+  // movie can just have nothing on file) — show a way to check by hand
+  // instead of going silent, which reads as broken rather than "no data."
+  return (
+    <p style={style}>
+      Check{' '}
+      <a
+        href="https://www.justwatch.com"
+        target="_blank"
+        rel="noreferrer"
+        style={{ color: 'var(--color-marquee-red)', textDecoration: 'underline' }}
+      >
+        JustWatch.com
+      </a>{' '}
+      for availability
+    </p>
+  );
+}
+
+// Shared layout for a revealed matchup — used by both "This Week" and "Past
+// Weeks" so the two stay visually identical. Everything stays left-aligned;
+// only the winner badge sits off to the side, at the bottom of the block.
+function RevealedMatchup({ mu, nameFor, movieTitles, watchProviders }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <p
+        style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: 11,
+          fontWeight: 700,
+          letterSpacing: '0.03em',
+          textTransform: 'uppercase',
+          color: 'var(--color-marquee-red)',
+          margin: '0 0 6px',
+        }}
+      >
+        Week {mu.round_number}
+      </p>
+
+      <p style={{ margin: 0, fontWeight: 600, color: 'var(--color-ink)' }}>
+        {nameFor(mu.player_a_id)} — {movieTitles[mu.player_a_tmdb_id] || '—'}
+      </p>
+      <StreamingLine providers={watchProviders[mu.player_a_tmdb_id]} />
+
+      <p style={{ margin: '8px 0 2px', fontWeight: 700, color: 'var(--color-ink)' }}>VS</p>
+
+      <p style={{ margin: 0, fontWeight: 600, color: 'var(--color-ink)' }}>
+        {nameFor(mu.player_b_id)} — {movieTitles[mu.player_b_tmdb_id] || '—'}
+      </p>
+      <StreamingLine providers={watchProviders[mu.player_b_tmdb_id]} />
+
+      <span
+        style={{
+          alignSelf: 'flex-end',
+          marginTop: 8,
+          background: 'var(--color-marquee-red)',
+          color: 'var(--color-paper)',
+          fontSize: 10,
+          fontWeight: 600,
+          padding: '4px 10px',
+          borderRadius: 20,
+          whiteSpace: 'nowrap',
+          letterSpacing: '0.03em',
+        }}
+      >
+        {mu.winner_id ? `★ ${nameFor(mu.winner_id).toUpperCase()}` : 'TIE'}
+      </span>
+    </div>
+  );
+}
+
 export default function SeasonPage() {
   const { id } = useParams();
   const router = useRouter();
@@ -301,71 +380,61 @@ export default function SeasonPage() {
 
               return (
                 <div key={mu.id} className="rc-card">
-                  <p className="rc-card-title">
-                    {nameFor(mu.player_a_id)} vs {nameFor(mu.player_b_id)}
-                  </p>
                   {mu.status === 'revealed' ? (
-                    <>
-                      <p className="rc-card-meta">
-                        {movieTitles[mu.player_a_tmdb_id] || '—'} ({mu.player_a_score?.toFixed(1)}) vs{' '}
-                        {movieTitles[mu.player_b_tmdb_id] || '—'} ({mu.player_b_score?.toFixed(1)}) —{' '}
-                        {mu.winner_id ? `${nameFor(mu.winner_id)} wins` : 'Tie'}
-                      </p>
-                      {[mu.player_a_tmdb_id, mu.player_b_tmdb_id].map((tid) => {
-                        const summary = summarizeProviders(watchProviders[tid]);
-                        if (!summary) return null;
-                        return (
-                          <p
-                            key={tid}
-                            className="rc-stat"
-                            style={{ fontSize: 13, color: 'var(--color-marquee-red)' }}
-                          >
-                            {movieTitles[tid]}: {summary.text}
-                          </p>
-                        );
-                      })}
-                    </>
-                  ) : canPick ? (
-                    <div style={{ marginTop: 10 }}>
-                      <select
-                        value={selectedMovie}
-                        onChange={(e) => setSelectedMovie(e.target.value)}
-                        className="rc-input"
-                        style={{ marginBottom: 10, width: '100%' }}
-                      >
-                        <option value="">Choose a movie from your roster...</option>
-                        {roster.map((r) => (
-                          <option key={r.tmdb_id} value={r.tmdb_id}>
-                            {r.movies?.title} {lockedScores[r.tmdb_id] !== undefined ? '(already scored)' : ''}
-                          </option>
-                        ))}
-                      </select>
-                      {selectedMovie && lockedScores[Number(selectedMovie)] === undefined && (
-                        <label className="rc-label" style={{ marginBottom: 10 }}>
-                          Your rating (1–10)
-                          <input
-                            type="number"
-                            min={1}
-                            max={10}
-                            value={rating}
-                            onChange={(e) => setRating(Number(e.target.value))}
-                            className="rc-input"
-                          />
-                        </label>
-                      )}
-                      <button
-                        onClick={() => handleSubmitPick(mu, isA)}
-                        disabled={!selectedMovie || submitting}
-                        className="rc-btn-primary"
-                      >
-                        {submitting ? 'Submitting...' : 'Submit Pick'}
-                      </button>
-                      {error && <p className="rc-error">{error}</p>}
-                    </div>
+                    <RevealedMatchup
+                      mu={mu}
+                      nameFor={nameFor}
+                      movieTitles={movieTitles}
+                      watchProviders={watchProviders}
+                    />
                   ) : (
-                    <p className="rc-card-meta">
-                      {isA || isB ? 'Waiting on your opponent to submit their pick.' : 'Not your matchup this week.'}
-                    </p>
+                    <>
+                      <p className="rc-card-title">
+                        {nameFor(mu.player_a_id)} vs {nameFor(mu.player_b_id)}
+                      </p>
+                      {canPick ? (
+                        <div style={{ marginTop: 10 }}>
+                          <select
+                            value={selectedMovie}
+                            onChange={(e) => setSelectedMovie(e.target.value)}
+                            className="rc-input"
+                            style={{ marginBottom: 10, width: '100%' }}
+                          >
+                            <option value="">Choose a movie from your roster...</option>
+                            {roster.map((r) => (
+                              <option key={r.tmdb_id} value={r.tmdb_id}>
+                                {r.movies?.title} {lockedScores[r.tmdb_id] !== undefined ? '(already scored)' : ''}
+                              </option>
+                            ))}
+                          </select>
+                          {selectedMovie && lockedScores[Number(selectedMovie)] === undefined && (
+                            <label className="rc-label" style={{ marginBottom: 10 }}>
+                              Your rating (1–10)
+                              <input
+                                type="number"
+                                min={1}
+                                max={10}
+                                value={rating}
+                                onChange={(e) => setRating(Number(e.target.value))}
+                                className="rc-input"
+                              />
+                            </label>
+                          )}
+                          <button
+                            onClick={() => handleSubmitPick(mu, isA)}
+                            disabled={!selectedMovie || submitting}
+                            className="rc-btn-primary"
+                          >
+                            {submitting ? 'Submitting...' : 'Submit Pick'}
+                          </button>
+                          {error && <p className="rc-error">{error}</p>}
+                        </div>
+                      ) : (
+                        <p className="rc-card-meta">
+                          {isA || isB ? 'Waiting on your opponent to submit their pick.' : 'Not your matchup this week.'}
+                        </p>
+                      )}
+                    </>
                   )}
                 </div>
               );
@@ -374,7 +443,7 @@ export default function SeasonPage() {
         )}
 
         <h2 className="rc-section-title">Past Weeks</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 8 }}>
           {matchups
             .filter((m) => m.status === 'revealed' && !m.is_bye)
             .map((mu) => (
@@ -384,49 +453,15 @@ export default function SeasonPage() {
                   background: 'var(--color-paper)',
                   borderLeft: '3px solid var(--color-marquee-red)',
                   borderRadius: 3,
-                  padding: '10px 14px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 4,
+                  padding: '12px 14px',
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-                  <div style={{ fontSize: 12, color: '#5a5347' }}>
-                    <span style={{ color: 'var(--color-marquee-red)', fontWeight: 600 }}>
-                      Wk {mu.round_number}
-                    </span>
-                    {'  '}
-                    {nameFor(mu.player_a_id)} ({movieTitles[mu.player_a_tmdb_id]}) vs{' '}
-                    {nameFor(mu.player_b_id)} ({movieTitles[mu.player_b_tmdb_id]})
-                  </div>
-                  <div
-                    style={{
-                      background: 'var(--color-marquee-red)',
-                      color: 'var(--color-paper)',
-                      fontSize: 10,
-                      fontWeight: 600,
-                      padding: '4px 10px',
-                      borderRadius: 20,
-                      whiteSpace: 'nowrap',
-                      letterSpacing: '0.03em',
-                    }}
-                  >
-                    {mu.winner_id ? `★ ${nameFor(mu.winner_id).toUpperCase()}` : 'TIE'}
-                  </div>
-                </div>
-                {[mu.player_a_tmdb_id, mu.player_b_tmdb_id].map((tid) => {
-                  const summary = summarizeProviders(watchProviders[tid]);
-                  if (!summary) return null;
-                  return (
-                    <p
-                      key={tid}
-                      className="rc-stat"
-                      style={{ fontSize: 13, color: 'var(--color-marquee-red)', margin: 0 }}
-                    >
-                      {movieTitles[tid]}: {summary.text}
-                    </p>
-                  );
-                })}
+                <RevealedMatchup
+                  mu={mu}
+                  nameFor={nameFor}
+                  movieTitles={movieTitles}
+                  watchProviders={watchProviders}
+                />
               </div>
             ))}
         </div>
