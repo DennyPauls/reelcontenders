@@ -346,12 +346,14 @@ export default function SeasonPage() {
   return (
     <div>
       <Header />
-      <main className="rc-page">
+      <main className="rc-page rc-season-page">
         <h1 className="rc-title">{league.name} — Season</h1>
         <p className="rc-stat" style={{ marginBottom: 24 }}>
           {seasonComplete ? 'Season complete' : `Week ${currentRoundNumber} of 12`}
         </p>
 
+        <div className="rc-season-grid">
+        <div className="rc-season-sidebar">
         <h2 className="rc-section-title">Standings</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 32 }}>
           {standings.map((s, i) => {
@@ -403,7 +405,9 @@ export default function SeasonPage() {
             );
           })}
         </div>
+        </div>
 
+        <div className="rc-season-main">
         {!seasonComplete && (
           <>
             <h2 className="rc-section-title">This Week</h2>
@@ -511,6 +515,8 @@ export default function SeasonPage() {
           Streaming availability provided by{' '}
           <a href="https://www.justwatch.com/" target="_blank" rel="noreferrer">JustWatch</a>.
         </p>
+        </div>
+        </div>
       </main>
     </div>
   );

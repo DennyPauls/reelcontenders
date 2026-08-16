@@ -232,3 +232,23 @@ a {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* --- Season page: two-column layout on desktop only --- */
+
+.rc-season-grid {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 960px) {
+  .rc-season-page {
+    max-width: 1040px;
+  }
+
+  .rc-season-grid {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    align-items: start;
+    gap: 32px;
+  }
+}
+
