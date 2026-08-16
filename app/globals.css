@@ -263,6 +263,28 @@ a {
   }
 }
 
+/* --- Generic responsive two-column layout, reused wherever content splits
+   into two side-by-side sections on desktop (e.g. homepage League vs
+   Family Feature explainer) --- */
+
+.rc-two-col {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+@media (min-width: 960px) {
+  .rc-home-page {
+    max-width: 960px;
+  }
+
+  .rc-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
 /* --- Family Feature reveal screen: intentionally celebratory, same break
    from the flat design language as the podium gradient treatment --- */
 
