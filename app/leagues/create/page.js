@@ -73,12 +73,13 @@ export default function CreateLeague() {
           <h1 className="rc-title">Start Something</h1>
           <p className="rc-subtitle">Pick the format that fits your group.</p>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'flex', flexDirection: 'row', gap: 16 }}>
             <button
               onClick={() => setMode('league')}
               className="rc-card"
-              style={{ textAlign: 'left', cursor: 'pointer', border: 'none', borderLeft: '4px solid var(--color-marquee-red)', width: '100%' }}
+              style={{ flex: 1, minWidth: 0, textAlign: 'left', cursor: 'pointer', border: 'none', borderLeft: '4px solid var(--color-marquee-red)' }}
             >
+              <p style={{ fontSize: 28, margin: '0 0 8px' }}>🏆</p>
               <p className="rc-card-title">The League</p>
               <p className="rc-card-meta">
                 A full fantasy season — everyone has their own account, drafts a roster, and plays
@@ -89,8 +90,9 @@ export default function CreateLeague() {
             <button
               onClick={() => router.push('/family/create')}
               className="rc-card"
-              style={{ textAlign: 'left', cursor: 'pointer', border: 'none', borderLeft: '4px solid var(--color-gold)', width: '100%' }}
+              style={{ flex: 1, minWidth: 0, textAlign: 'left', cursor: 'pointer', border: 'none', borderLeft: '4px solid var(--color-gold)' }}
             >
+              <p style={{ fontSize: 28, margin: '0 0 8px' }}>🍿</p>
               <p className="rc-card-title">Family Feature</p>
               <p className="rc-card-meta">
                 One person runs the whole thing on their own phone — name your family, pick a movie
