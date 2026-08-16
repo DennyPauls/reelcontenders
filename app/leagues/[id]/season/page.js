@@ -353,14 +353,56 @@ export default function SeasonPage() {
         </p>
 
         <h2 className="rc-section-title">Standings</h2>
-        <ul className="rc-list" style={{ marginBottom: 32 }}>
-          {standings.map((s, i) => (
-            <li key={s.user_id}>
-              #{i + 1} {s.users?.display_name || s.users?.email} — {s.wins}-{s.losses}{' '}
-              <span className="rc-stat">({s.totalScore.toFixed(1)} pts)</span>
-            </li>
-          ))}
-        </ul>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 32 }}>
+          {standings.map((s, i) => {
+            const isFirst = i === 0;
+            return (
+              <div
+                key={s.user_id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 14,
+                  background: 'var(--color-paper)',
+                  borderLeft: `4px solid ${isFirst ? 'var(--color-gold)' : 'var(--color-muted)'}`,
+                  borderRadius: 4,
+                  padding: '12px 16px',
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 26,
+                    fontWeight: 700,
+                    color: 'var(--color-ink)',
+                    minWidth: 30,
+                  }}
+                >
+                  {i + 1}
+                </span>
+                <div style={{ flex: 1 }}>
+                  <p style={{ margin: 0, fontWeight: 600, color: 'var(--color-ink)' }}>
+                    {s.users?.display_name || s.users?.email}
+                  </p>
+                  <p style={{ margin: 0, fontSize: 12, color: 'var(--color-muted)' }}>
+                    {s.totalScore.toFixed(1)} pts
+                  </p>
+                </div>
+                <span
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: 14,
+                    fontWeight: 600,
+                    color: 'var(--color-ink)',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {s.wins}-{s.losses}
+                </span>
+              </div>
+            );
+          })}
+        </div>
 
         {!seasonComplete && (
           <>
