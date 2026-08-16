@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '../../../lib/supabaseClient';
 import GradientRankCard, { RANK_GRADIENTS } from '../../components/GradientRankCard';
@@ -25,9 +25,27 @@ function RatedProgress({ ratedCount, totalPicks, style }) {
   );
 }
 
+const CONFETTI_COLORS = ['var(--color-gold)', 'var(--color-cream-text)', '#b8860b', 'var(--color-paper)'];
+
+function generateConfetti(count = 24) {
+  return Array.from({ length: count }, (_, i) => ({
+    id: i,
+    left: Math.random() * 100,
+    delay: Math.random() * 0.4,
+    duration: 1.8 + Math.random() * 0.8,
+    size: 6 + Math.random() * 6,
+    color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+    rounded: i % 3 === 0,
+  }));
+}
+
 export default function FamilySessionPage() {
   const { id } = useParams();
   const router = useRouter();
+
+  // Generated once per page load so the reveal's confetti plays through
+  // briefly rather than looping or re-randomizing on every re-render.
+  const confettiPieces = useMemo(() => generateConfetti(), []);
 
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
@@ -194,19 +212,68 @@ export default function FamilySessionPage() {
     return (
       <div>
         <Header />
-        <main className="rc-page">
-          <h1 className="rc-title">{session.name}</h1>
-          <p className="rc-subtitle" style={{ marginBottom: 24 }}>And the winner is...</p>
+        <main className="rc-page" style={{ position: 'relative' }}>
+          <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 5 }}>
+            {confettiPieces.map((c) => (
+              <span
+                key={c.id}
+                className="rc-confetti-piece"
+                style={{
+                  left: `${c.left}%`,
+                  width: c.size,
+                  height: c.size,
+                  background: c.color,
+                  borderRadius: c.rounded ? '50%' : 2,
+                  animationDelay: `${c.delay}s`,
+                  animationDuration: `${c.duration}s`,
+                }}
+              />
+            ))}
+          </div>
+
+          <p style={{ fontSize: 12, fontFamily: 'var(--font-mono)', color: 'var(--color-muted)', textAlign: 'center', margin: '0 0 8px' }}>
+            {session.name}
+          </p>
+
+          <div style={{ textAlign: 'center', marginBottom: 24 }}>
+            <p className="rc-trophy-drop" style={{ fontSize: 64, margin: '0 0 4px' }}>🏆</p>
+            <p
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: 13,
+                fontWeight: 700,
+                letterSpacing: '0.15em',
+                textTransform: 'uppercase',
+                color: 'var(--color-gold)',
+                margin: '0 0 6px',
+              }}
+            >
+              The Winner Is
+            </p>
+            <h1
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 46,
+                fontWeight: 700,
+                letterSpacing: '0.5px',
+                textTransform: 'uppercase',
+                color: 'var(--color-gold-bright)',
+                margin: '0 0 8px',
+              }}
+            >
+              {winner?.player?.name}!
+            </h1>
+            <p className="rc-subtitle" style={{ margin: 0 }}>
+              picked {winner?.movies?.title}
+            </p>
+          </div>
 
           {winner && (
             <GradientRankCard label="Winner" gradient={RANK_GRADIENTS[0]}>
               <p style={{ margin: '0 0 4px', fontSize: 20, fontWeight: 700, color: 'var(--color-ink)' }}>
                 {winner.movies?.title}
               </p>
-              <p style={{ margin: '0 0 4px', color: 'var(--color-ink)' }}>
-                Picked by {winner.player?.name}
-              </p>
-              <p style={{ margin: 0, fontSize: 14, color: 'var(--color-muted)' }}>
+              <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: 'var(--color-marquee-red)' }}>
                 {winner.avg.toFixed(1)} average rating
               </p>
             </GradientRankCard>
