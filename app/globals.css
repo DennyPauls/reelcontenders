@@ -246,7 +246,7 @@ a {
 
   .rc-season-grid {
     display: grid;
-    grid-template-columns: 240px 1fr;
+    grid-template-columns: 264px 1fr;
     align-items: start;
     gap: 32px;
   }

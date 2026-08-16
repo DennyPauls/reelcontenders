@@ -382,8 +382,8 @@ export default function SeasonPage() {
                 >
                   {i + 1}
                 </span>
-                <div style={{ flex: 1 }}>
-                  <p style={{ margin: 0, fontWeight: 600, color: 'var(--color-ink)' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ margin: 0, fontWeight: 600, color: 'var(--color-ink)', overflowWrap: 'break-word' }}>
                     {s.users?.display_name || s.users?.email}
                   </p>
                   <p style={{ margin: 0, fontSize: 12, color: 'var(--color-muted)' }}>
