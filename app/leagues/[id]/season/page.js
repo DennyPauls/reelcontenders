@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '../../../../lib/supabaseClient';
 import { summarizeProviders } from '../../../../lib/watchProviders';
+import GradientRankCard, { RANK_GRADIENTS } from '../../../components/GradientRankCard';
 import Header from '../../../components/Header';
 
 function scoreMovie(revenue, tmdbScore, rating) {
@@ -118,53 +119,16 @@ function RevealedMatchup({ mu, nameFor, movieTitles, watchProviders }) {
 
 const PODIUM_LABELS = ['1st', '2nd', '3rd'];
 
-// Deliberately breaks from the site's flat design language — standings are
-// meant to feel like a trophy moment. Metallic gradients: gold, silver, bronze.
-const PODIUM_GRADIENTS = [
-  'linear-gradient(90deg, #b8860b, #f4d576, #b8860b, #f4d576, #b8860b)',
-  'linear-gradient(90deg, #8e8e8e, #eef0f1, #8e8e8e, #eef0f1, #8e8e8e)',
-  'linear-gradient(90deg, #8a5a2e, #cd7f32, #8a5a2e, #cd7f32, #8a5a2e)',
-];
-
 function PodiumCard({ rank, s }) {
-  const gradient = PODIUM_GRADIENTS[rank - 1];
   return (
-    <div
-      style={{
-        flex: 1,
-        minWidth: 0,
-        background: 'var(--color-paper)',
-        borderRadius: 4,
-        overflow: 'hidden',
-      }}
-    >
-      <div style={{ height: 8, backgroundImage: gradient }} />
-      <div style={{ padding: '16px 14px' }}>
-        <p
-          style={{
-            margin: '0 0 8px',
-            fontFamily: 'var(--font-display)',
-            fontSize: 22,
-            fontWeight: 700,
-            letterSpacing: '0.5px',
-            textTransform: 'uppercase',
-            backgroundImage: gradient,
-            WebkitBackgroundClip: 'text',
-            backgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            color: 'transparent',
-          }}
-        >
-          {PODIUM_LABELS[rank - 1]}
-        </p>
-        <p style={{ margin: '0 0 4px', fontWeight: 600, color: 'var(--color-ink)', overflowWrap: 'break-word' }}>
-          {s.users?.display_name || s.users?.email}
-        </p>
-        <p style={{ margin: 0, fontSize: 12, color: 'var(--color-muted)' }}>
-          {s.wins}-{s.losses} · {s.totalScore.toFixed(1)} pts
-        </p>
-      </div>
-    </div>
+    <GradientRankCard label={PODIUM_LABELS[rank - 1]} gradient={RANK_GRADIENTS[rank - 1]}>
+      <p style={{ margin: '0 0 4px', fontWeight: 600, color: 'var(--color-ink)', overflowWrap: 'break-word' }}>
+        {s.users?.display_name || s.users?.email}
+      </p>
+      <p style={{ margin: 0, fontSize: 12, color: 'var(--color-muted)' }}>
+        {s.wins}-{s.losses} · {s.totalScore.toFixed(1)} pts
+      </p>
+    </GradientRankCard>
   );
 }
 

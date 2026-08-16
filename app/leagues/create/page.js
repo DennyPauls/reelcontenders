@@ -6,6 +6,7 @@ import { supabase } from '../../../lib/supabaseClient';
 import Header from '../../components/Header';
 
 export default function CreateLeague() {
+  const [mode, setMode] = useState(null); // null | 'league'
   const [name, setName] = useState('');
   const [contentRatingCap, setContentRatingCap] = useState('PG-13');
   const [picksPerPlayer, setPicksPerPlayer] = useState(8);
@@ -61,6 +62,45 @@ export default function CreateLeague() {
     } else {
       router.push(`/leagues/${league.id}`);
     }
+  }
+
+  if (mode === null) {
+    return (
+      <div>
+        <Header />
+
+        <main className="rc-page" style={{ maxWidth: 560 }}>
+          <h1 className="rc-title">Start Something</h1>
+          <p className="rc-subtitle">Pick the format that fits your group.</p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <button
+              onClick={() => setMode('league')}
+              className="rc-card"
+              style={{ textAlign: 'left', cursor: 'pointer', border: 'none', borderLeft: '4px solid var(--color-marquee-red)', width: '100%' }}
+            >
+              <p className="rc-card-title">The League</p>
+              <p className="rc-card-meta">
+                A full fantasy season — everyone has their own account, drafts a roster, and plays
+                weekly head-to-head matchups over the season.
+              </p>
+            </button>
+
+            <button
+              onClick={() => router.push('/family/create')}
+              className="rc-card"
+              style={{ textAlign: 'left', cursor: 'pointer', border: 'none', borderLeft: '4px solid var(--color-gold)', width: '100%' }}
+            >
+              <p className="rc-card-title">Family Feature</p>
+              <p className="rc-card-meta">
+                One person runs the whole thing on their own phone — name your family, pick a movie
+                for each person, then pass the phone around to rate them once you've watched.
+              </p>
+            </button>
+          </div>
+        </main>
+      </div>
+    );
   }
 
   return (
