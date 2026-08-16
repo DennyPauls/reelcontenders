@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '../../../../lib/supabaseClient';
+import { summarizeProviders } from '../../../../lib/watchProviders';
 import Header from '../../../components/Header';
 
 function scoreMovie(revenue, tmdbScore, rating) {
@@ -45,6 +46,7 @@ export default function SeasonPage() {
   const [members, setMembers] = useState([]);
   const [matchups, setMatchups] = useState([]);
   const [movieTitles, setMovieTitles] = useState({});
+  const [watchProviders, setWatchProviders] = useState({});
   const [roster, setRoster] = useState([]);
   const [lockedScores, setLockedScores] = useState({});
   const [loading, setLoading] = useState(true);
@@ -156,6 +158,10 @@ export default function SeasonPage() {
         .select('tmdb_id, title')
         .in('tmdb_id', [...tmdbIds]);
       setMovieTitles(Object.fromEntries((movieRows || []).map((mv) => [mv.tmdb_id, mv.title])));
+
+      const wpRes = await fetch(`/api/watch-providers?ids=${[...tmdbIds].join(',')}`);
+      const wpData = await wpRes.json();
+      setWatchProviders(wpData.providers || {});
     }
 
     // This user's roster
@@ -299,11 +305,22 @@ export default function SeasonPage() {
                     {nameFor(mu.player_a_id)} vs {nameFor(mu.player_b_id)}
                   </p>
                   {mu.status === 'revealed' ? (
-                    <p className="rc-card-meta">
-                      {movieTitles[mu.player_a_tmdb_id] || '—'} ({mu.player_a_score?.toFixed(1)}) vs{' '}
-                      {movieTitles[mu.player_b_tmdb_id] || '—'} ({mu.player_b_score?.toFixed(1)}) —{' '}
-                      {mu.winner_id ? `${nameFor(mu.winner_id)} wins` : 'Tie'}
-                    </p>
+                    <>
+                      <p className="rc-card-meta">
+                        {movieTitles[mu.player_a_tmdb_id] || '—'} ({mu.player_a_score?.toFixed(1)}) vs{' '}
+                        {movieTitles[mu.player_b_tmdb_id] || '—'} ({mu.player_b_score?.toFixed(1)}) —{' '}
+                        {mu.winner_id ? `${nameFor(mu.winner_id)} wins` : 'Tie'}
+                      </p>
+                      {[mu.player_a_tmdb_id, mu.player_b_tmdb_id].map((tid) => {
+                        const summary = summarizeProviders(watchProviders[tid]);
+                        if (!summary) return null;
+                        return (
+                          <p key={tid} className="rc-stat" style={{ fontSize: 11 }}>
+                            {movieTitles[tid]}: {summary.label} {summary.names.join(', ')}
+                          </p>
+                        );
+                      })}
+                    </>
                   ) : canPick ? (
                     <div style={{ marginTop: 10 }}>
                       <select
@@ -353,7 +370,7 @@ export default function SeasonPage() {
         )}
 
         <h2 className="rc-section-title">Past Weeks</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 24 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
           {matchups
             .filter((m) => m.status === 'revealed' && !m.is_bye)
             .map((mu) => (
@@ -365,36 +382,50 @@ export default function SeasonPage() {
                   borderRadius: 3,
                   padding: '10px 14px',
                   display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  gap: 12,
+                  flexDirection: 'column',
+                  gap: 4,
                 }}
               >
-                <div style={{ fontSize: 12, color: '#5a5347' }}>
-                  <span style={{ color: 'var(--color-marquee-red)', fontWeight: 600 }}>
-                    Wk {mu.round_number}
-                  </span>
-                  {'  '}
-                  {nameFor(mu.player_a_id)} ({movieTitles[mu.player_a_tmdb_id]}) vs{' '}
-                  {nameFor(mu.player_b_id)} ({movieTitles[mu.player_b_tmdb_id]})
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+                  <div style={{ fontSize: 12, color: '#5a5347' }}>
+                    <span style={{ color: 'var(--color-marquee-red)', fontWeight: 600 }}>
+                      Wk {mu.round_number}
+                    </span>
+                    {'  '}
+                    {nameFor(mu.player_a_id)} ({movieTitles[mu.player_a_tmdb_id]}) vs{' '}
+                    {nameFor(mu.player_b_id)} ({movieTitles[mu.player_b_tmdb_id]})
+                  </div>
+                  <div
+                    style={{
+                      background: 'var(--color-marquee-red)',
+                      color: 'var(--color-paper)',
+                      fontSize: 10,
+                      fontWeight: 600,
+                      padding: '4px 10px',
+                      borderRadius: 20,
+                      whiteSpace: 'nowrap',
+                      letterSpacing: '0.03em',
+                    }}
+                  >
+                    {mu.winner_id ? `★ ${nameFor(mu.winner_id).toUpperCase()}` : 'TIE'}
+                  </div>
                 </div>
-                <div
-                  style={{
-                    background: 'var(--color-marquee-red)',
-                    color: 'var(--color-paper)',
-                    fontSize: 10,
-                    fontWeight: 600,
-                    padding: '4px 10px',
-                    borderRadius: 20,
-                    whiteSpace: 'nowrap',
-                    letterSpacing: '0.03em',
-                  }}
-                >
-                  {mu.winner_id ? `★ ${nameFor(mu.winner_id).toUpperCase()}` : 'TIE'}
-                </div>
+                {[mu.player_a_tmdb_id, mu.player_b_tmdb_id].map((tid) => {
+                  const summary = summarizeProviders(watchProviders[tid]);
+                  if (!summary) return null;
+                  return (
+                    <p key={tid} style={{ fontSize: 10, color: 'var(--color-muted)', margin: 0 }}>
+                      {movieTitles[tid]}: {summary.label.toLowerCase()} {summary.names.join(', ')}
+                    </p>
+                  );
+                })}
               </div>
             ))}
         </div>
+        <p className="rc-stat" style={{ fontSize: 11, marginBottom: 24 }}>
+          Streaming availability provided by{' '}
+          <a href="https://www.justwatch.com/" target="_blank" rel="noreferrer">JustWatch</a>.
+        </p>
       </main>
     </div>
   );

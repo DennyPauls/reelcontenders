@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '../../../../lib/supabaseClient';
 import { isRatingAllowed } from '../../../../lib/contentRating';
+import { summarizeProviders } from '../../../../lib/watchProviders';
 import Header from '../../../components/Header';
 
 export default function DraftRoom() {
@@ -14,6 +15,7 @@ export default function DraftRoom() {
   const [league, setLeague] = useState(null);
   const [members, setMembers] = useState([]);
   const [picks, setPicks] = useState([]);
+  const [watchProviders, setWatchProviders] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -56,6 +58,13 @@ export default function DraftRoom() {
       .eq('league_id', id)
       .order('pick_number', { ascending: true });
     setPicks(pickData || []);
+
+    const pickTmdbIds = (pickData || []).map((p) => p.tmdb_id);
+    if (pickTmdbIds.length > 0) {
+      const wpRes = await fetch(`/api/watch-providers?ids=${pickTmdbIds.join(',')}`);
+      const wpData = await wpRes.json();
+      setWatchProviders(wpData.providers || {});
+    }
 
     setLoading(false);
   }, [id, router]);
@@ -252,6 +261,12 @@ export default function DraftRoom() {
         )}
 
         <h2 className="rc-section-title">Rosters</h2>
+        {picks.length > 0 && (
+          <p className="rc-stat" style={{ fontSize: 11, marginBottom: 12 }}>
+            Streaming availability provided by{' '}
+            <a href="https://www.justwatch.com/" target="_blank" rel="noreferrer">JustWatch</a>.
+          </p>
+        )}
         {members.map((m) => (
           <div key={m.user_id} style={{ marginBottom: 20 }}>
             <p style={{ fontFamily: 'var(--font-mono)', fontSize: 14, color: 'var(--color-gold-bright)', marginBottom: 6 }}>
@@ -261,9 +276,19 @@ export default function DraftRoom() {
             <ul className="rc-list">
               {picks
                 .filter((p) => p.user_id === m.user_id)
-                .map((p) => (
-                  <li key={p.id}>{p.movies?.title} ({p.movies?.release_date?.slice(0, 4)})</li>
-                ))}
+                .map((p) => {
+                  const summary = summarizeProviders(watchProviders[p.tmdb_id]);
+                  return (
+                    <li key={p.id}>
+                      {p.movies?.title} ({p.movies?.release_date?.slice(0, 4)})
+                      {summary && (
+                        <span className="rc-stat" style={{ marginLeft: 8 }}>
+                          {summary.label} {summary.names.join(', ')}
+                        </span>
+                      )}
+                    </li>
+                  );
+                })}
               {picks.filter((p) => p.user_id === m.user_id).length === 0 && (
                 <li style={{ color: 'var(--color-muted)' }}>No picks yet</li>
               )}
