@@ -282,8 +282,11 @@ export default function DraftRoom() {
                     <li key={p.id}>
                       {p.movies?.title} ({p.movies?.release_date?.slice(0, 4)})
                       {summary && (
-                        <span className="rc-stat" style={{ marginLeft: 8 }}>
-                          {summary.label} {summary.names.join(', ')}
+                        <span
+                          className="rc-stat"
+                          style={{ marginLeft: 8, fontSize: 13, color: 'var(--color-cream-text)' }}
+                        >
+                          {summary.text}
                         </span>
                       )}
                     </li>

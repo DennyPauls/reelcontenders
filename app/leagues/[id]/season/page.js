@@ -315,8 +315,12 @@ export default function SeasonPage() {
                         const summary = summarizeProviders(watchProviders[tid]);
                         if (!summary) return null;
                         return (
-                          <p key={tid} className="rc-stat" style={{ fontSize: 11 }}>
-                            {movieTitles[tid]}: {summary.label} {summary.names.join(', ')}
+                          <p
+                            key={tid}
+                            className="rc-stat"
+                            style={{ fontSize: 13, color: 'var(--color-marquee-red)' }}
+                          >
+                            {movieTitles[tid]}: {summary.text}
                           </p>
                         );
                       })}
@@ -414,8 +418,12 @@ export default function SeasonPage() {
                   const summary = summarizeProviders(watchProviders[tid]);
                   if (!summary) return null;
                   return (
-                    <p key={tid} style={{ fontSize: 10, color: 'var(--color-muted)', margin: 0 }}>
-                      {movieTitles[tid]}: {summary.label.toLowerCase()} {summary.names.join(', ')}
+                    <p
+                      key={tid}
+                      className="rc-stat"
+                      style={{ fontSize: 13, color: 'var(--color-marquee-red)', margin: 0 }}
+                    >
+                      {movieTitles[tid]}: {summary.text}
                     </p>
                   );
                 })}
