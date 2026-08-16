@@ -113,22 +113,6 @@ export default function DraftRoom() {
       return;
     }
 
-    const { error: upsertError } = await supabase.from('movies').upsert({
-      tmdb_id: details.tmdbId,
-      title: details.title,
-      release_date: details.releaseDate,
-      poster_path: details.posterPath,
-      revenue: details.revenue,
-      tmdb_score: details.tmdbScore,
-      content_rating: details.contentRating,
-    });
-
-    if (upsertError) {
-      setError(upsertError.message);
-      setPickingId(null);
-      return;
-    }
-
     const nextPickNumber = picks.length + 1;
 
     const { error: pickError } = await supabase.from('draft_picks').insert({
