@@ -1,3 +1,5 @@
+import { getContentRatings } from '../../../lib/tmdbServer';
+
 // Fetches full movie details (including box office revenue) at the moment
 // a pick is made, so we have real data to score it with later.
 export async function GET(request) {
@@ -15,6 +17,10 @@ export async function GET(request) {
     if (!tmdbRes.ok) throw new Error(`TMDB responded with status ${tmdbRes.status}`);
     const m = await tmdbRes.json();
 
+    const ratings = await getContentRatings([
+      { id: m.id, title: m.title, releaseDate: m.release_date, posterPath: m.poster_path },
+    ]);
+
     return Response.json({
       tmdbId: m.id,
       title: m.title,
@@ -22,6 +28,7 @@ export async function GET(request) {
       posterPath: m.poster_path || null,
       revenue: m.revenue || 0,
       tmdbScore: m.vote_average || 0,
+      contentRating: ratings.get(m.id) || 'NR',
     });
   } catch (err) {
     return Response.json({ error: err.message }, { status: 500 });

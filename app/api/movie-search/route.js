@@ -1,3 +1,5 @@
+import { getContentRatings } from '../../../lib/tmdbServer';
+
 // Runs on the server so the TMDB key stays hidden from the browser.
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -26,7 +28,13 @@ export async function GET(request) {
         voteAverage: m.vote_average,
       }));
 
-    return Response.json({ results });
+    const ratings = await getContentRatings(results);
+    const resultsWithRatings = results.map((m) => ({
+      ...m,
+      contentRating: ratings.get(m.id) || 'NR',
+    }));
+
+    return Response.json({ results: resultsWithRatings });
   } catch (err) {
     return Response.json({ results: [], error: err.message }, { status: 500 });
   }

@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '../../../../lib/supabaseClient';
+import { isRatingAllowed } from '../../../../lib/contentRating';
 import Header from '../../../components/Header';
 
 export default function DraftRoom() {
@@ -89,6 +90,11 @@ export default function DraftRoom() {
   }
 
   async function handlePick(movie) {
+    if (!isRatingAllowed(movie.contentRating, league.content_rating_cap)) {
+      setError(`${movie.title} exceeds this league's ${league.content_rating_cap} cap.`);
+      return;
+    }
+
     setPickingId(movie.id);
     setError('');
 
@@ -101,6 +107,12 @@ export default function DraftRoom() {
       return;
     }
 
+    if (!isRatingAllowed(details.contentRating, league.content_rating_cap)) {
+      setError(`${details.title} exceeds this league's ${league.content_rating_cap} cap.`);
+      setPickingId(null);
+      return;
+    }
+
     const { error: upsertError } = await supabase.from('movies').upsert({
       tmdb_id: details.tmdbId,
       title: details.title,
@@ -108,6 +120,7 @@ export default function DraftRoom() {
       poster_path: details.posterPath,
       revenue: details.revenue,
       tmdb_score: details.tmdbScore,
+      content_rating: details.contentRating,
     });
 
     if (upsertError) {
@@ -215,21 +228,28 @@ export default function DraftRoom() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 12 }}>
                   {results.map((movie) => {
                     const taken = draftedTmdbIds.has(movie.id);
+                    const allowed = isRatingAllowed(movie.contentRating, league.content_rating_cap);
+                    const disabled = taken || !allowed || pickingId === movie.id;
                     return (
-                      <div key={movie.id} className="rc-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: taken ? 0.5 : 1 }}>
+                      <div key={movie.id} className="rc-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: taken || !allowed ? 0.5 : 1 }}>
                         <div>
                           <p className="rc-card-title">{movie.title}</p>
                           <p className="rc-card-meta">
-                            {movie.releaseDate?.slice(0, 4)} · TMDB {movie.voteAverage?.toFixed(1)}/10
+                            {movie.releaseDate?.slice(0, 4)} · TMDB {movie.voteAverage?.toFixed(1)}/10 · {movie.contentRating}
                           </p>
+                          {!allowed && !taken && (
+                            <p className="rc-card-meta" style={{ color: '#e3897d' }}>
+                              Exceeds league's {league.content_rating_cap} cap
+                            </p>
+                          )}
                         </div>
                         <button
                           onClick={() => handlePick(movie)}
-                          disabled={taken || pickingId === movie.id}
+                          disabled={disabled}
                           className="rc-btn-secondary"
                           style={{ borderColor: 'var(--color-marquee-red)', color: 'var(--color-marquee-red)' }}
                         >
-                          {taken ? 'Taken' : pickingId === movie.id ? 'Drafting...' : 'Draft'}
+                          {taken ? 'Taken' : !allowed ? 'Capped' : pickingId === movie.id ? 'Drafting...' : 'Draft'}
                         </button>
                       </div>
                     );
