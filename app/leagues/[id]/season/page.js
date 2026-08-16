@@ -116,6 +116,67 @@ function RevealedMatchup({ mu, nameFor, movieTitles, watchProviders }) {
   );
 }
 
+const PODIUM_LABELS = ['1st', '2nd', '3rd'];
+
+function PodiumCard({ rank, s }) {
+  return (
+    <div
+      style={{
+        flex: 1,
+        minWidth: 0,
+        background: 'var(--color-paper)',
+        borderTop: `4px solid ${rank === 1 ? 'var(--color-gold)' : 'var(--color-muted)'}`,
+        borderRadius: 4,
+        padding: '16px 14px',
+      }}
+    >
+      <p
+        style={{
+          margin: '0 0 8px',
+          fontFamily: 'var(--font-display)',
+          fontSize: 22,
+          fontWeight: 700,
+          letterSpacing: '0.5px',
+          textTransform: 'uppercase',
+          color: 'var(--color-marquee-red)',
+        }}
+      >
+        {PODIUM_LABELS[rank - 1]}
+      </p>
+      <p style={{ margin: '0 0 4px', fontWeight: 600, color: 'var(--color-ink)', overflowWrap: 'break-word' }}>
+        {s.users?.display_name || s.users?.email}
+      </p>
+      <p style={{ margin: 0, fontSize: 12, color: 'var(--color-muted)' }}>
+        {s.wins}-{s.losses} · {s.totalScore.toFixed(1)} pts
+      </p>
+    </div>
+  );
+}
+
+function CompactStandingRow({ rank, s }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        padding: '6px 0',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+      }}
+    >
+      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--color-muted)', minWidth: 20 }}>
+        {rank}
+      </span>
+      <span style={{ flex: 1, minWidth: 0, fontWeight: 500, color: 'var(--color-cream-text)', overflowWrap: 'break-word' }}>
+        {s.users?.display_name || s.users?.email}
+      </span>
+      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--color-muted)', whiteSpace: 'nowrap' }}>
+        {s.wins}-{s.losses} · {s.totalScore.toFixed(1)} pts
+      </span>
+    </div>
+  );
+}
+
 export default function SeasonPage() {
   const { id } = useParams();
   const router = useRouter();
@@ -337,6 +398,9 @@ export default function SeasonPage() {
     return { ...m, wins, losses, totalScore };
   }).sort((a, b) => b.wins - a.wins || b.totalScore - a.totalScore);
 
+  const podiumStandings = standings.slice(0, 3);
+  const restStandings = standings.slice(3);
+
   // Current week = earliest round with any non-revealed, non-bye matchup
   const activeMatchup = matchups.find((m) => !m.is_bye && m.status !== 'revealed');
   const currentRoundNumber = activeMatchup?.round_number;
@@ -352,62 +416,22 @@ export default function SeasonPage() {
           {seasonComplete ? 'Season complete' : `Week ${currentRoundNumber} of 12`}
         </p>
 
-        <div className="rc-season-grid">
-        <div className="rc-season-sidebar">
         <h2 className="rc-section-title">Standings</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 32 }}>
-          {standings.map((s, i) => {
-            const isFirst = i === 0;
-            return (
-              <div
-                key={s.user_id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 14,
-                  background: 'var(--color-paper)',
-                  borderLeft: `4px solid ${isFirst ? 'var(--color-gold)' : 'var(--color-muted)'}`,
-                  borderRadius: 4,
-                  padding: '12px 16px',
-                }}
-              >
-                <span
-                  style={{
-                    fontFamily: 'var(--font-display)',
-                    fontSize: 26,
-                    fontWeight: 700,
-                    color: 'var(--color-ink)',
-                    minWidth: 30,
-                  }}
-                >
-                  {i + 1}
-                </span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ margin: 0, fontWeight: 600, color: 'var(--color-ink)', overflowWrap: 'break-word' }}>
-                    {s.users?.display_name || s.users?.email}
-                  </p>
-                  <p style={{ margin: 0, fontSize: 12, color: 'var(--color-muted)' }}>
-                    {s.totalScore.toFixed(1)} pts
-                  </p>
-                </div>
-                <span
-                  style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: 14,
-                    fontWeight: 600,
-                    color: 'var(--color-ink)',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {s.wins}-{s.losses}
-                </span>
-              </div>
-            );
-          })}
+        <div className="rc-podium-row">
+          {podiumStandings.map((s, i) => (
+            <PodiumCard key={s.user_id} rank={i + 1} s={s} />
+          ))}
         </div>
-        </div>
+        {restStandings.length > 0 && (
+          <div className="rc-standings-list" style={{ marginBottom: 32 }}>
+            {restStandings.map((s, i) => (
+              <CompactStandingRow key={s.user_id} rank={i + 4} s={s} />
+            ))}
+          </div>
+        )}
 
-        <div className="rc-season-main">
+        <div className="rc-season-columns">
+        <div>
         {!seasonComplete && (
           <>
             <h2 className="rc-section-title">This Week</h2>
@@ -487,7 +511,9 @@ export default function SeasonPage() {
             })}
           </>
         )}
+        </div>
 
+        <div>
         <h2 className="rc-section-title">Past Weeks</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 8 }}>
           {matchups

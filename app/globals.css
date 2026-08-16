@@ -232,9 +232,20 @@ a {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* --- Season page: two-column layout on desktop only --- */
+/* --- Season page: standings podium + This Week/Past Weeks columns --- */
 
-.rc-season-grid {
+.rc-podium-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.rc-standings-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.rc-season-columns {
   display: flex;
   flex-direction: column;
 }
@@ -244,9 +255,9 @@ a {
     max-width: 1040px;
   }
 
-  .rc-season-grid {
+  .rc-season-columns {
     display: grid;
-    grid-template-columns: 264px 1fr;
+    grid-template-columns: 1fr 1fr;
     align-items: start;
     gap: 32px;
   }
