@@ -280,7 +280,16 @@ export default function FamilySessionPage() {
       <Header />
       <main className="rc-page">
         <h1 className="rc-title">{session.name}</h1>
-        <p className="rc-stat" style={{ marginBottom: 24 }}>
+        <p
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 28,
+            fontWeight: 700,
+            letterSpacing: '0.5px',
+            color: 'var(--color-gold)',
+            margin: '0 0 24px',
+          }}
+        >
           {ratedCount} of {totalPicks} movies rated
         </p>
 
@@ -298,7 +307,9 @@ export default function FamilySessionPage() {
               >
                 <div>
                   <p className="rc-card-title">{pick.movies?.title}</p>
-                  <p className="rc-card-meta">Picked by {player?.name}</p>
+                  <p className="rc-card-meta" style={{ fontWeight: 700, color: 'var(--color-marquee-red)' }}>
+                    Picked by {player?.name}
+                  </p>
                 </div>
                 {isFullyRated ? (
                   <span className="rc-stat">Rated ✓</span>
@@ -314,7 +325,7 @@ export default function FamilySessionPage() {
                   </button>
                 ) : (
                   <button onClick={() => handleMarkWatched(pick.id)} className="rc-btn-primary">
-                    Mark Watched
+                    Watched — Rate It
                   </button>
                 )}
               </div>
