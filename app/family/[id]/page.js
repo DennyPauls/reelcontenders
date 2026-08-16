@@ -6,6 +6,25 @@ import { supabase } from '../../../lib/supabaseClient';
 import GradientRankCard, { RANK_GRADIENTS } from '../../components/GradientRankCard';
 import Header from '../../components/Header';
 
+// Shared so the hub and voting screens always match exactly.
+function RatedProgress({ ratedCount, totalPicks, style }) {
+  return (
+    <p
+      style={{
+        fontFamily: 'var(--font-display)',
+        fontSize: 28,
+        fontWeight: 700,
+        letterSpacing: '0.5px',
+        color: 'var(--color-gold)',
+        margin: 0,
+        ...style,
+      }}
+    >
+      {ratedCount} of {totalPicks} movies rated
+    </p>
+  );
+}
+
 export default function FamilySessionPage() {
   const { id } = useParams();
   const router = useRouter();
@@ -22,6 +41,7 @@ export default function FamilySessionPage() {
   const [selectedRating, setSelectedRating] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [revealAll, setRevealAll] = useState(false);
+  const [confirmation, setConfirmation] = useState(null); // { name, nextName } | null
 
   const loadAll = useCallback(async () => {
     const { data: userData } = await supabase.auth.getUser();
@@ -115,7 +135,7 @@ export default function FamilySessionPage() {
     setSelectedRating(null);
   }
 
-  async function handleSubmitRating(currentVoter, remainingCount) {
+  async function handleSubmitRating(currentVoter, remainingPlayersList) {
     if (!selectedRating || !currentVoter) return;
     setSubmitting(true);
     setError('');
@@ -132,12 +152,18 @@ export default function FamilySessionPage() {
       return;
     }
 
-    const wasLastVoter = remainingCount <= 1;
+    const wasLastVoter = remainingPlayersList.length <= 1;
+    const nextVoter = remainingPlayersList.find((p) => p.id !== currentVoter.id);
     setSelectedRating(null);
-    await loadAll();
-    if (wasLastVoter) {
-      setVotingPickId(null);
-    }
+    setConfirmation({ name: currentVoter.name, nextName: nextVoter?.name || null });
+
+    setTimeout(async () => {
+      setConfirmation(null);
+      await loadAll();
+      if (wasLastVoter) {
+        setVotingPickId(null);
+      }
+    }, 700);
   }
 
   if (loading) return <p style={{ margin: 40, color: 'var(--color-cream-text)' }}>Loading...</p>;
@@ -224,6 +250,21 @@ export default function FamilySessionPage() {
     const remainingPlayers = players.filter((p) => !alreadyRatedIds.has(p.id));
     const currentVoter = remainingPlayers[0];
 
+    if (confirmation) {
+      return (
+        <div>
+          <Header />
+          <main className="rc-page" style={{ maxWidth: 420, textAlign: 'center' }}>
+            <p style={{ fontSize: 48, margin: '48px 0 12px' }}>✅</p>
+            <h1 className="rc-title" style={{ fontSize: 30 }}>Got it, {confirmation.name}!</h1>
+            <p className="rc-subtitle">
+              {confirmation.nextName ? `Passing to ${confirmation.nextName}...` : 'Finishing up...'}
+            </p>
+          </main>
+        </div>
+      );
+    }
+
     if (!currentVoter) {
       // The effect above will clear votingPickId and fall back to the hub.
       return null;
@@ -233,9 +274,9 @@ export default function FamilySessionPage() {
       <div>
         <Header />
         <main className="rc-page" style={{ maxWidth: 420, textAlign: 'center' }}>
-          <p className="rc-stat" style={{ marginBottom: 8 }}>{votingPick?.movies?.title}</p>
-          <h1 className="rc-title" style={{ fontSize: 30 }}>Pass to {currentVoter.name}</h1>
-          <p className="rc-subtitle">Rate this movie 1–10</p>
+          <h1 className="rc-title" style={{ fontSize: 36 }}>{votingPick?.movies?.title}</h1>
+          <p className="rc-subtitle" style={{ marginBottom: 4 }}>Pass to {currentVoter.name}</p>
+          <p className="rc-stat" style={{ marginBottom: 20 }}>Rate this movie 1–10</p>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8, margin: '20px 0' }}>
             {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
@@ -258,7 +299,7 @@ export default function FamilySessionPage() {
           {error && <p className="rc-error">{error}</p>}
 
           <button
-            onClick={() => handleSubmitRating(currentVoter, remainingPlayers.length)}
+            onClick={() => handleSubmitRating(currentVoter, remainingPlayers)}
             disabled={!selectedRating || submitting}
             className="rc-btn-primary"
             style={{ width: '100%' }}
@@ -266,9 +307,7 @@ export default function FamilySessionPage() {
             {submitting ? 'Submitting...' : 'Submit & Next'}
           </button>
 
-          <p className="rc-stat" style={{ marginTop: 20 }}>
-            {ratedCount} of {totalPicks} movies rated
-          </p>
+          <RatedProgress ratedCount={ratedCount} totalPicks={totalPicks} style={{ marginTop: 20 }} />
         </main>
       </div>
     );
@@ -280,18 +319,7 @@ export default function FamilySessionPage() {
       <Header />
       <main className="rc-page">
         <h1 className="rc-title">{session.name}</h1>
-        <p
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 28,
-            fontWeight: 700,
-            letterSpacing: '0.5px',
-            color: 'var(--color-gold)',
-            margin: '0 0 24px',
-          }}
-        >
-          {ratedCount} of {totalPicks} movies rated
-        </p>
+        <RatedProgress ratedCount={ratedCount} totalPicks={totalPicks} style={{ marginBottom: 24 }} />
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {picks.map((pick) => {
